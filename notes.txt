@@ -1,0 +1,61 @@
+
+
+EPISODE - 1
+*****************************************************
+
+install express
+create a server
+create prot
+listen to server
+version controlling - ^4.16.3 ( if cap symbol is present then project version keeps auto updating minor and patch )
+package.lock.json - will tell the exact version of the dependancies version ( because package.json version gets keep on updating . This file will lock the version)
+~ - installs only patch updates not minor version
+^ - installs minor version but not major version
+
+SCENARIO -1 
+-----------------
+-> when the first route handler has route ('/') then since it matches all other routes this route handler will get returned. so the order is important
+app.use("/", (req, res) => {
+  res.send("hello just");
+});
+
+app.use("/test", (req, res) => {
+  res.send("hello test");
+});
+
+app.use("/hello", (req, res) => {
+  res.send("hello from route hello");
+});
+
+The first route handler is defined as app.use("/", ...).
+This will match any route, including /test and /hello, because / is the root route, which matches everything.
+Since it's at the top, it will always be hit first and send "hello just", even before the more specific /test and /hello routes.
+
+SCENARIO- -2 
+-------------
+->DIFFERENCE BETWEEN app.use() and app.get(), post, delete, put, patch
+
+Middleware and Route Handling in Action:
+app.use() is typically used for middleware tasks like logging, authentication, or handling requests before they reach the route handler.
+
+Route methods like app.get() are used for handling specific requests based on the HTTP method and route.
+
+// This will run for all incoming requests to /test 
+This middleware will only run for routes that start with /test, such as:
+/test
+/test/abc
+/test/123/xyz
+
+app.use("/test", (req, res, next) => {
+  console.log("Middleware function for /test route");
+  next();  // Pass to the next handler
+});
+
+
+EPISODE -  2
+**********************************************
+
+
+
+
+
