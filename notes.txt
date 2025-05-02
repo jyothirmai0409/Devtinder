@@ -30,6 +30,8 @@ app.use("/hello", (req, res) => {
 The first route handler is defined as app.use("/", ...).
 This will match any route, including /test and /hello, because / is the root route, which matches everything.
 Since it's at the top, it will always be hit first and send "hello just", even before the more specific /test and /hello routes.
+The sequence of code is matters. Order of the code is important
+play with route and route extensions 
 
 SCENARIO- -2 
 -------------
@@ -54,6 +56,76 @@ app.use("/test", (req, res, next) => {
 
 EPISODE -  2
 **********************************************
+
+Connect with GIT - 
+steps:- 
+
+cd path/to/your/project
+1.git init
+2.git add .
+3.git commit -m "Initial commit"
+4.git remote add origin https://github.com/your-username/your-repo.git
+5.git branch -M main  # Optional: rename to 'main' if needed
+6.git push -u origin main
+7.git config --global user.name "your-github-username"
+8.git config --global user.email "your-email@example.com"
+9.git push -u origin main
+
+// request handler
+
+// route matches -  regular expression
+// -ab*cd -> "abjbdjdcbfiebcd" , "ab123cd" ( start with ab and ends with cd - in between it can have anything)
+// -ab?c - > "ac","abc"
+// -ab+c - > "abbbbbbbbbbc", "abbc" (starts with a and ends with c in between you can add as many b's as you want)
+//  /a/ - > if in the path a is present then execute
+//  /.*fly$/ - > starts with anything but should end with fly - "abdsdfly", "fly"
+
+// request handler
+
+// route matches -  regular expression
+// -ab*cd -> "abjbdjdcbfiebcd" , "ab123cd" ( start with ab and ends with cd - in between it can have anything)
+// -ab?c - > "ac","abc"
+// -ab+c - > "abbbbbbbbbbc", "abbc" (starts with a and ends with c in between you can add as many b's as you want)
+//  /a/ - > if in the path a is present then execute
+//  /.*fly$/ - > starts with anything but should end with fly - "abdsdfly", "fly"
+
+DIFFERENCE BETWEEN QUERY PARAMS AND DYNAMIC ROUTING
+--------------------------------------------------------
+
+app.get("/user", (req, res) => {
+  // http://localhost:8000/user?userId=1&age=10
+  console.log("query params", req.query);
+
+  res.json({
+    fname: "jyothi",
+    lname: "kattamuri",
+  });
+});
+
+// reading the dynamic routes
+
+app.get("/user/:id/:name/:age", (req, res) => {
+  // http://localhost:8000/user?userId=1&age=10
+  console.log("by id's", req.params);
+
+  res.json({
+    fname: "jyothi",
+    lname: "kattamuri",
+  });
+});
+
+EPISODE - 3
+***********************************
+
+
+
+
+
+
+
+
+
+
 
 
 
