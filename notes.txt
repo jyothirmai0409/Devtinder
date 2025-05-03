@@ -1,6 +1,6 @@
 
 
-EPISODE - 1
+EPISODE - 1 ( create a server )
 *****************************************************
 
 install express
@@ -54,7 +54,7 @@ app.use("/test", (req, res, next) => {
 });
 
 
-EPISODE -  2
+EPISODE -  2 ( Route handling )
 **********************************************
 
 Connect with GIT - 
@@ -114,15 +114,123 @@ app.get("/user/:id/:name/:age", (req, res) => {
   });
 });
 
-EPISODE - 3
+EPISODE - 3 ( Middleware and error handling)
 ***********************************
+SCENARIO - 1
+app.use(
+  "/",
+  (req, res, next) => {
+    console.log("test");
+    res.send("first handler");
+    next(); // This won't run after res.send(), but included for clarity
+  },
+  (req, res) => {
+    console.log("2nd handler");
+    res.send("2nd handler");
+  }
+);
+
+
+- > In the above scenario we will get error because for same route we are trying to send multiple responses so we will get below error - Cannot set headers after they are sent to the client
+-> javascript is executed line by line once next() is called then it goes to 2nd handler and prints console log but when it try to execute 2nd response it throws error
+-> once it sends the response then it closes the coonection  ( tcp request and response concept)
+-> even the below scenario also gives same error
+
+SCENARIO -2 
+-----------
+
+app.use(
+  "/",
+  (req, res, next) => {
+    console.log("test");
+    next(); // This will run after res.send(), but included for clarity
+    res.send("first handler");
+  },
+  (req, res) => {
+    console.log("2nd handler");
+    res.send("2nd handler");
+  }
+);
+
+SCENARIO - 3
+---------------
+-> in the below scenario we will get "cannot get / " error because it is expecting route handler that sends response but there is not next route handler
+app.use(
+  "/",
+  (req, res, next) => {
+    console.log("test");
+    next();
+  },
+  (req, res) => {
+    console.log("2nd handler");
+    next();
+  },
+  (req, res) => {
+    console.log("3rd handler");
+    next();
+  }
+);
+
+SCENARIO - 4
+---------------
+-> since there is no next() , it keep on executing , will not give any error
+app.use(
+  "/",
+  (req, res, next) => {
+    console.log("test");
+    next();
+  },
+  (req, res,next) => {
+    console.log("2nd handler");
+    next();
+  },
+  (req, res,next) => {
+    console.log("3rd handler");
+  }
+);
+
+SCENARIO - 5
+---------------------
+-> We can send array of route handlers 
+-> app.use('/',[rh1,rh2,rh3],rh4,rh5)
 
 
 
+SCENARIO - 6
+---------------------
+-> below case we will not get any error , since there is not next() , it will not go to 2nd toute handler
+app.use("/", (req, res, next) => {
+  console.log("test");
+  res.send("hi there");
+});
+
+app.use("/", (req, res, next) => {
+  console.log("test");
+  next();
+});
+
+MIDDLEWARE USE CASE :- lets say when admin wants to get all users data or delete all usersdata, in both the cases we need to authenticate if the logged in user is admin or not , so in that scenario we can 
+deal using middlewares because we can write middleware once and can be used at any route handler
 
 
+// the below handler will handle anything that comes after /xyz, /test, /1 - so always place app.use carefully in the code either top or last
+app.use("/admin", (req, res, next) => {
+  const token = "xyz";
+  const isAuth = token === "xyz";
+  if (!isAuth) {
+    res.status(401).send("Unauthorised");
+  } else {
+    next();
+  }
+});
 
+app.get("/admin", (req, res) => {
+  res.send("fetched users successfully");
+});
 
+app.delete("/", (req, res) => {
+  res.send("deleted users successfully");
+});
 
 
 
