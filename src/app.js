@@ -2,7 +2,7 @@ const express = require("express");
 const { authMiddleware, userMiddleware } = require("./middlewares/auth");
 const app = express();
 
-// the below handler will handle anything that comes after /xyz, /test, /1 - so always place app.use carefully in the code either top or last
+// // the below handler will handle anything that comes after /xyz, /test, /1 - so always place app.use carefully in the code either top or last
 app.use("/admin", authMiddleware);
 // app.use("/user", userMiddleware);
 

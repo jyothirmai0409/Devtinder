@@ -232,6 +232,16 @@ app.delete("/", (req, res) => {
   res.send("deleted users successfully");
 });
 
+ERROR Handling
+---------------------
+app.get("/errorhandling", (req, res, next) => {
+  try {
+    throw new Error("something went wrong");
+  } catch (err) {
+    next(err); // pass the error to the error-handling middleware
+  }
+});
+
 
 
 
