@@ -1,33 +1,40 @@
+require("dotenv").config();
+
 const express = require("express");
+const connectDB = require("./config/database");
 const { authMiddleware, userMiddleware } = require("./middlewares/auth");
+const User = require("./models/user");
 const app = express();
-
-// // the below handler will handle anything that comes after /xyz, /test, /1 - so always place app.use carefully in the code either top or last
-app.use("/admin", authMiddleware);
-// app.use("/user", userMiddleware);
-
-app.get("/admin", (req, res) => {
-  res.send("fetched users successfully");
-});
-
-app.delete("/admin", (req, res) => {
-  res.send("deleted users successfully");
-});
-
-app.get("/user", (req, res) => {
-  res.send("fetched users successfully");
-});
-
-// the below way of using middleware is also correct
-
-app.get("/user", userMiddleware, (req, res) => {
-  res.send("fetched users successfully");
-});
-
-// define port
 const PORT = process.env.PORT || 8000;
+app.use(express.json()); // ✅ Required for parsing JSON body
 
-// start server
-app.listen(PORT, () => {
-  console.log(`server is running at port ${PORT}`);
+app.post("/signup", async (req, res) => {
+  console.log("i m here", req);
+  try {
+    const { firstName, lastName, age, gender, emailId, password } = req.body;
+    const user = new User({
+      firstName,
+      lastName,
+      age,
+      gender,
+      emailId,
+      password,
+    });
+    await user.save();
+    res.status(200).send("user created successfully");
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("error in adding user" + err.message);
+  }
 });
+
+connectDB()
+  .then(() => {
+    console.log("db connected successfullly");
+    app.listen(PORT, () => {
+      console.log(`server is running at port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });

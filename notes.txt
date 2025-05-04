@@ -243,6 +243,23 @@ app.get("/errorhandling", (req, res, next) => {
 });
 
 
+EPISODE - 4
+---------------------
+
+MONGODB - 
+sign up in modngodb.com
+create and deplot cluster - get the connection string 
+download mongodb compass - mongodb.com/products/tools/compass 
+add a connection string and create databases
+database - collections - documents ( db-tables-rows)
+
+How to connect from code:-
+-------------------
+install mongodb, mongoose 
+create database.js file and connect to the mongoose using connection string (connecting to the devtinder database)
+in app.js file connect to db and listen to server
+
+
 
 
 
