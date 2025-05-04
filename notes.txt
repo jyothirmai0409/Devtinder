@@ -259,6 +259,15 @@ install mongodb, mongoose
 create database.js file and connect to the mongoose using connection string (connecting to the devtinder database)
 in app.js file connect to db and listen to server
 
+EPISODE - 5
+------------------
+
+ 
+DIFFERENCE BETWEEN find and findOne
+****************************8
+find(): Retrieves multiple documents as a cursor, used when expecting more than one result.
+findOne(): Retrieves a single document that matches the query, or null if no match is found.
+
 
 
 

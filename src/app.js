@@ -28,6 +28,32 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).send("Error in fetching users" + err.message);
+  }
+});
+
+// get user by email
+
+app.get("/user", async (req, res) => {
+  try {
+    const { userEmail } = req.body;
+    const user = await User.find({ emailId: userEmail });
+    // const user = await User.findOne({ emailId: userEmail });
+    if (user.length === 0) {
+      res.status(404).send("user not found");
+    } else {
+      res.status(200).json(user);
+    }
+  } catch (err) {
+    res.status(500).send("Error in fetching user" + err.message);
+  }
+});
+
 connectDB()
   .then(() => {
     console.log("db connected successfullly");
