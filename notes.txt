@@ -268,6 +268,12 @@ DIFFERENCE BETWEEN find and findOne
 find(): Retrieves multiple documents as a cursor, used when expecting more than one result.
 findOne(): Retrieves a single document that matches the query, or null if no match is found.
 
+DIFFERENCE BETWEEN findByIdAndUpdate & findOneAndUpdate
+
+* `findByIdAndUpdate` updates a document using its `_id` directly.
+* `findOneAndUpdate` updates the first matching document based on any filter (e.g., email, name).
+
+
 
 
 
