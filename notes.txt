@@ -273,6 +273,12 @@ DIFFERENCE BETWEEN findByIdAndUpdate & findOneAndUpdate
 * `findByIdAndUpdate` updates a document using its `_id` directly.
 * `findOneAndUpdate` updates the first matching document based on any filter (e.g., email, name).
 
+EPISODE  - 6
+-------------------------------
+data sanitization and schema validation
+
+npm library - validator ( for validating email and passwords)
+
 
 
 

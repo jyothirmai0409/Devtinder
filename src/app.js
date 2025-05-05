@@ -72,7 +72,7 @@ app.delete("/user/:id", async (req, res) => {
 
 app.patch("/user/:id", async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.params?.id;
     const allowedFields = [
       "firstName",
       "lastName",
@@ -85,6 +85,14 @@ app.patch("/user/:id", async (req, res) => {
     const updates = Object.fromEntries(
       Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
     );
+
+    // const isAllowed = Object.keys(req.body).every((k) =>
+    //   allowedFields.includes(k)
+    // );
+
+    // if (!isAllowed) {
+    //   throw new Error("Update now allowed");
+    // }
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
