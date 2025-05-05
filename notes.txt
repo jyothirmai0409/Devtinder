@@ -280,6 +280,51 @@ data sanitization and schema validation
 npm library - validator ( for validating email and passwords)
 never trust req.body
 
+EPISODE - 7 ( AUTHENTICATION )
+
+- unless you login you cannot perform geting users, updating user, sending friend request ...etc
+-> user has a IP and server has an IP , they are using TCP/IP protocol to make a connection 
+-> user will request the data and server will send the response and the connection is closed
+-> every time you make a api call to the server a connection is made and once it sends response and the connection is closed 
+-> when user makes api call to update profile data, server will authenticate the req and make the changes and return the response. This happens for every api call being made 
+-> every time you make an api call the server needs to authenticate/validate if the user is logged in or not
+-> user logins with email and password, then server creates the jwt (jsonwebtoken) using login credentials and send the token in the response. Now user will store the token ( local storage ) 
+and send the token every time he makes an api call ( delete, get, post, patch)
+-> for every request the server will validate the token , once it is verified user then it sends the response.
+-> how the token is stored:- web came up with a solution called cookies 
+
+
+-> server will validate email and password and create jwt token and wrap token inside a cookie
+-> token is very unique oand only associated to this user
+-> server will send the cookie in the response to the user and user stores it in browser
+-> when user makes api call then cookie also sent and server will validate the cookie and then profile info is updated and response is sent back
+-> this is repeated process 
+-> when user make api call with expired cookie then validation at server side fails and server sends the response to user to login again and redirect to login page
+
+important code
+****************************************
+app.use(express.json()); // ✅ Required for parsing JSON body
+app.use(cookieParser()); //'to read a cookie we need cookie parser middleware' ( express js package)
+const hashedPassword = await bcrypt.hash(password, 10); // signup
+res.clearCookie("token"); //logout
+const token = req.cookies?.token; // auth middleware validate user details
+const decoded = await jwt.verify(token, process.env.SECRET_KEY); // auth middleware validate user details
+const isMatch = await bcrypt.compare(password, loginUser.password); //login
+const token = await jwt.sign(
+          {
+            userId: loginUser._id, // Unique user identifier
+            email: loginUser.emailId, // For reference (optional)
+            // Optional (if your app has roles like "admin", "user")
+          },
+          process.env.SECRET_KEY,
+          {
+            expiresIn: "1h",
+          }
+        ); // login
+res.cookie("token", token); // login
+
+MONGOOSE SCHEMA METHODS
+---------------------------------
 
 
 

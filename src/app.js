@@ -1,14 +1,17 @@
 require("dotenv").config();
 
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
-const { authMiddleware, userMiddleware } = require("./middlewares/auth");
+const { authMiddleware } = require("./middlewares/auth");
 const User = require("./models/user");
 const bcrypt = require("bcrypt");
 const { validateSignupData } = require("./utils/validate");
 const app = express();
 const PORT = process.env.PORT || 8000;
 app.use(express.json()); // ✅ Required for parsing JSON body
+app.use(cookieParser()); //'to read a cookie we need cookie parser middleware' ( express js package)
 
 app.post("/signup", async (req, res) => {
   //   console.log("i m here", req);
@@ -33,6 +36,11 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.status(200).send("Logged out successfully");
+});
+
 app.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
@@ -40,7 +48,19 @@ app.post("/login", async (req, res) => {
     if (loginUser) {
       const isMatch = await bcrypt.compare(password, loginUser.password);
       if (isMatch) {
-        res.status(200).send("loggedin successful");
+        const token = await jwt.sign(
+          {
+            userId: loginUser._id, // Unique user identifier
+            email: loginUser.emailId, // For reference (optional)
+            // Optional (if your app has roles like "admin", "user")
+          },
+          process.env.SECRET_KEY,
+          {
+            expiresIn: "1h",
+          }
+        );
+        res.cookie("token", token);
+        res.status(200).json({ message: "loggedin successfully", token });
       } else {
         throw new Error("invalid password");
       }
@@ -52,7 +72,19 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/feed", async (req, res) => {
+app.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const userDetails = req.user;
+    if (!userDetails) {
+      res.status(404).send("user not found");
+    }
+    res.status(200).json(userDetails);
+  } catch (err) {
+    res.status(400).send("error fetching user profile" + err.message);
+  }
+});
+
+app.get("/feed", authMiddleware, async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -63,7 +95,7 @@ app.get("/feed", async (req, res) => {
 
 // get user by email
 
-app.get("/user", async (req, res) => {
+app.get("/user", authMiddleware, async (req, res) => {
   try {
     const { userEmail } = req.body;
     const user = await User.find({ emailId: userEmail });
@@ -78,7 +110,7 @@ app.get("/user", async (req, res) => {
   }
 });
 
-app.delete("/user/:id", async (req, res) => {
+app.delete("/user/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
     const deletedUser = await User.findByIdAndDelete({ _id: id });
@@ -92,11 +124,20 @@ app.delete("/user/:id", async (req, res) => {
   }
 });
 
+app.post("/sendConnectionRequest", authMiddleware, async (req, res) => {
+  const user = req.user;
+  res.send("connection request sent");
+});
+
 // update user
 
-app.patch("/user/:id", async (req, res) => {
+app.patch("/user/:id", authMiddleware, async (req, res) => {
   try {
     const id = req.params?.id;
+    console.log("user detailsssssssssss", req.user._id, id);
+    if (req.user._id.toString() !== id.toString()) {
+      throw new Error("Update now allowed");
+    }
     const allowedFields = [
       "firstName",
       "lastName",
