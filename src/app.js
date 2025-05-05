@@ -4,27 +4,51 @@ const express = require("express");
 const connectDB = require("./config/database");
 const { authMiddleware, userMiddleware } = require("./middlewares/auth");
 const User = require("./models/user");
+const bcrypt = require("bcrypt");
+const { validateSignupData } = require("./utils/validate");
 const app = express();
 const PORT = process.env.PORT || 8000;
 app.use(express.json()); // ✅ Required for parsing JSON body
 
 app.post("/signup", async (req, res) => {
-  console.log("i m here", req);
+  //   console.log("i m here", req);
   try {
     const { firstName, lastName, age, gender, emailId, password } = req.body;
+    // validation data
+    validateSignupData(req);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       firstName,
       lastName,
       age,
       gender,
       emailId,
-      password,
+      password: hashedPassword,
     });
     await user.save();
     res.status(200).send("user created successfully");
   } catch (err) {
     console.log(err);
     res.status(400).send("error in adding user" + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const loginUser = await User.findOne({ emailId });
+    if (loginUser) {
+      const isMatch = await bcrypt.compare(password, loginUser.password);
+      if (isMatch) {
+        res.status(200).send("loggedin successful");
+      } else {
+        throw new Error("invalid password");
+      }
+    } else {
+      throw new Error("user not found");
+    }
+  } catch (err) {
+    res.status(400).send("error in logging user" + err.message);
   }
 });
 

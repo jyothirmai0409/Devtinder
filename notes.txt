@@ -278,6 +278,7 @@ EPISODE  - 6
 data sanitization and schema validation
 
 npm library - validator ( for validating email and passwords)
+never trust req.body
 
 
 
