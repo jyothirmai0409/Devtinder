@@ -309,7 +309,7 @@ const hashedPassword = await bcrypt.hash(password, 10); // signup
 res.clearCookie("token"); //logout
 const token = req.cookies?.token; // auth middleware validate user details
 const decoded = await jwt.verify(token, process.env.SECRET_KEY); // auth middleware validate user details
-const isMatch = await bcrypt.compare(password, loginUser.password); //login
+const isMatch = await bcrypt.compare(password, loginUser.password); //login always first parameter is normal password next is hashed password
 const token = await jwt.sign(
           {
             userId: loginUser._id, // Unique user identifier

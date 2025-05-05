@@ -46,19 +46,9 @@ app.post("/login", async (req, res) => {
     const { emailId, password } = req.body;
     const loginUser = await User.findOne({ emailId });
     if (loginUser) {
-      const isMatch = await bcrypt.compare(password, loginUser.password);
+      const isMatch = await loginUser.validatePassword(password);
       if (isMatch) {
-        const token = await jwt.sign(
-          {
-            userId: loginUser._id, // Unique user identifier
-            email: loginUser.emailId, // For reference (optional)
-            // Optional (if your app has roles like "admin", "user")
-          },
-          process.env.SECRET_KEY,
-          {
-            expiresIn: "1h",
-          }
-        );
+        const token = await loginUser.getJWT();
         res.cookie("token", token);
         res.status(200).json({ message: "loggedin successfully", token });
       } else {
