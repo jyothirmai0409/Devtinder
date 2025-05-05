@@ -97,9 +97,10 @@ userSchema.methods.getJWT = async function () {
   return token;
 };
 
-userSchema.methods.validatePassword = async function (password) {
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
   const user = this;
-  const isMatch = await bcrypt.compare(password, user.password);
+  const passwordHash = user.password;
+  const isMatch = await bcrypt.compare(passwordInputByUser, passwordHash);
   return isMatch;
 };
 
