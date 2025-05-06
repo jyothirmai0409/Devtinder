@@ -326,6 +326,37 @@ res.cookie("token", token); // login
 MONGOOSE SCHEMA METHODS
 ---------------------------------
 
+List Of API's :-
+************************88888
+1./signup - post
+2./login - post
+3./feed - get
+4./profile - patch ( email and password should not update) , get
+5./logout - get
+6./
+
+/signup  - post
+/login  - post
+/logout  - get
+
+/profile/view - get
+/profile/edit  - patch
+/profile/password - patch
+
+/request/send/intrested/:userId  - post
+/request/send/ignored/:userId - post
+
+/request/review/accepted/:userId - post
+/request/review/rejected/:userId - post
+
+user/connections - get 
+user/requests - get
+user/feed - get
+
+
+intrested, ignored
+accept,reject
+
 
 
 
