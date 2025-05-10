@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const ConnectionRequest = require("./connectionRequest");
 
 const userSchema = new mongoose.Schema(
   {
@@ -63,6 +64,18 @@ const userSchema = new mongoose.Schema(
     about: {
       type: String,
     },
+    connections: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    requests: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ConnectionRequest",
+      },
+    ],
     skills: {
       type: [String],
       validate(arr) {

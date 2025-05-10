@@ -326,6 +326,17 @@ res.cookie("token", token); // login
 MONGOOSE SCHEMA METHODS
 ---------------------------------
 
+ const existingRequest = await ConnectionRequest.findOne({
+      $or: [
+        { fromUserId, toUserId },
+        { fromUserId: toUserId, toUserId: fromUserId },
+      ],
+    });
+    
+
+    
+EPISODE - 8 ( API's )
+
 List Of API's :-
 ************************88888
 1./signup - post
@@ -357,6 +368,10 @@ user/feed - get
 intrested, ignored
 accept,reject
 
+EPISODE - 9 ( DB query )
+
+-> or, and, logical queries in mongodb with examples
+->schema.pre
 
 
 

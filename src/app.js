@@ -8,6 +8,7 @@ const User = require("./models/user");
 const authRouter = require("./routes/authRouter");
 const profileRouter = require("./routes/profileRouter");
 const requestRouter = require("./routes/requestRouter");
+const userRouter = require("./routes/userRouter");
 const app = express();
 const PORT = process.env.PORT || 8000;
 
@@ -17,15 +18,7 @@ app.use(cookieParser()); //'to read a cookie we need cookie parser middleware' (
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/request", requestRouter);
-
-app.get("/feed", authMiddleware, async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(500).send("Error in fetching users" + err.message);
-  }
-});
+app.use("/user", userRouter);
 
 // get user by email
 
