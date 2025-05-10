@@ -64,18 +64,6 @@ const userSchema = new mongoose.Schema(
     about: {
       type: String,
     },
-    connections: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-    requests: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "ConnectionRequest",
-      },
-    ],
     skills: {
       type: [String],
       validate(arr) {

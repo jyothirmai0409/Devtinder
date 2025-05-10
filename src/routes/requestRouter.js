@@ -39,17 +39,17 @@ router.post("/send/:status/:userId", authMiddleware, async (req, res) => {
       status,
     });
     const data = await request.save();
-    res.status(200).json({ message: "connection request sent", data });
+    return res.status(200).json({ message: "connection request sent", data });
   } catch (err) {
     console.log(err);
-    res.status(400).send("connection request failed to send");
+    return res.status(400).send("connection request failed to send");
   }
 });
 
-router.post("/review/:status/:userId", authMiddleware, async (req, res) => {
+router.post("/review/:status/:requestId", authMiddleware, async (req, res) => {
   try {
     const toUserId = req.user._id; // The logged-in user reviewing the request
-    const fromUserId = req.params.userId; // The sender of the original request
+    const requestId = req.params.requestId; // The sender of the original request
     const status = req.params.status;
 
     const validStatuses = ["accepted", "rejected"];
@@ -58,8 +58,9 @@ router.post("/review/:status/:userId", authMiddleware, async (req, res) => {
     }
 
     const connectionRequest = await ConnectionRequest.findOne({
-      fromUserId,
+      _id: requestId,
       toUserId,
+      status: "interested",
     });
 
     if (!connectionRequest) {
@@ -67,27 +68,14 @@ router.post("/review/:status/:userId", authMiddleware, async (req, res) => {
     }
 
     connectionRequest.status = status;
-    if (status === "accepted") {
-      // Add connection to both users
-      if (!req.user.connections.includes(fromUserId)) {
-        req.user.connections.push(fromUserId);
-      }
 
-      // Also add the reviewer (toUser) to the fromUser's connections
-      const fromUser = await User.findById(fromUserId);
-      if (fromUser && !fromUser.connections.includes(req.user._id)) {
-        fromUser.connections.push(req.user._id);
-        await fromUser.save();
-      }
-
-      await req.user.save();
-    }
-
-    await connectionRequest.save();
-    res.status(200).send(`Connection request ${status}`);
+    const data = await connectionRequest.save();
+    return res
+      .status(200)
+      .json({ message: `connection request ${status}`, data });
   } catch (err) {
     console.error("Review request error:", err.message);
-    res.status(400).send("Failed to review connection request");
+    return res.status(400).send("Failed to review connection request");
   }
 });
 

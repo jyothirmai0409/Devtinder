@@ -373,6 +373,8 @@ EPISODE - 9 ( DB query )
 -> or, and, logical queries in mongodb with examples
 ->schema.pre
 
+EPISODE - 10 ( ref and populate )
+
 
 
 

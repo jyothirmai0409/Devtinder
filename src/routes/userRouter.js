@@ -4,55 +4,90 @@ const User = require("../models/user");
 const ConnectionRequest = require("../models/connectionRequest");
 const { authMiddleware } = require("../middlewares/auth");
 
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
+
 router.get("/connections", authMiddleware, async (req, res) => {
   try {
-    const populatedUser = await req.user.populate("connections");
-    res.status(200).json(populatedUser.connections);
+    const loggedInUser = req.user;
+
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [
+        { toUserId: loggedInUser._id, status: "accepted" },
+        { fromUserId: loggedInUser._id, status: "accepted" },
+      ],
+    })
+      .populate("fromUserId", USER_SAFE_DATA)
+      .populate("toUserId", USER_SAFE_DATA);
+
+    // always pass the fields that are required , if we dont pass then entire user object along with emailid and password will be fetched to frontend which leads to data leakage
+
+    console.log(connectionRequests);
+
+    const data = connectionRequests.map((row) => {
+      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
+        return row.toUserId;
+      }
+      return row.fromUserId;
+    });
+
+    res.json({ data });
   } catch (err) {
-    console.error("Error fetching connections:", err.message);
-    res.status(500).send("Failed to fetch connections");
+    res.status(400).send({ message: err.message });
   }
 });
 
+// Get all the pending connection request for the loggedIn user
 router.get("/requests", authMiddleware, async (req, res) => {
   try {
-    const requests = await ConnectionRequest.find({
-      toUserId: req.user._id,
-    }).populate("fromUserId"); // Optional: populate sender info
+    const loggedInUser = req.user;
 
-    res.status(200).json(requests);
+    const connectionRequests = await ConnectionRequest.find({
+      toUserId: loggedInUser._id,
+      status: "interested",
+    }).populate("fromUserId", USER_SAFE_DATA);
+    // }).populate("fromUserId", ["firstName", "lastName"]);
+
+    res.json({
+      message: "Data fetched successfully",
+      data: connectionRequests,
+    });
   } catch (err) {
-    console.error("Error fetching requests:", err.message);
-    res.status(500).send("Failed to fetch requests");
+    req.statusCode(400).send("ERROR: " + err.message);
   }
 });
 
 router.get("/feed", authMiddleware, async (req, res) => {
   try {
-    const loggedInUserId = req.user._id;
+    const loggedInUser = req.user;
 
-    // 1. Find all connection requests involving the logged-in user
-    const requests = await ConnectionRequest.find({
-      $or: [{ fromUserId: loggedInUserId }, { toUserId: loggedInUserId }],
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
+
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId  toUserId");
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
     });
 
-    // 2. Extract all user IDs to exclude (users already involved in a request)
-    const excludedUserIds = new Set();
-    requests.forEach((req) => {
-      excludedUserIds.add(req.fromUserId.toString());
-      excludedUserIds.add(req.toUserId.toString());
-    });
-    excludedUserIds.add(loggedInUserId.toString()); // Also exclude self
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit);
 
-    // 3. Fetch all users except those in the excluded set
-    const userFeed = await User.find({
-      _id: { $nin: Array.from(excludedUserIds) },
-    });
-
-    res.status(200).json(userFeed);
+    res.json({ data: users });
   } catch (err) {
-    console.error("Error in fetching users:", err.message);
-    res.status(500).send("Error in fetching users");
+    res.status(400).json({ message: err.message });
   }
 });
 
