@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      required: true,
+      // required: true,
       // enum: ["Male", "Female", "Other"],
       validate(value) {
         if (!["male", "female", "otherrs"].includes(value)) {
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: true,
+      // required: true,
       min: 18,
     },
     password: {
@@ -63,6 +63,7 @@ const userSchema = new mongoose.Schema(
     },
     about: {
       type: String,
+      default: "This is user",
     },
     skills: {
       type: [String],

@@ -19,11 +19,19 @@ router.post("/signup", async (req, res) => {
       emailId,
       password: hashedPassword,
     });
-    await user.save();
-    res.status(200).send("user created successfully");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 8 * 3600000),
+    });
+
+    res
+      .status(200)
+      .json({ message: "user created successfully", user: savedUser });
   } catch (err) {
     console.log(err);
-    res.status(400).send("error in adding user" + err.message);
+    res.status(400).send(err.message);
   }
 });
 
@@ -44,7 +52,9 @@ router.post("/login", async (req, res) => {
       if (isMatch) {
         const token = await loginUser.getJWT();
         res.cookie("token", token);
-        res.status(200).json({ message: "loggedin successfully", token });
+        res
+          .status(200)
+          .json({ message: "loggedin successfully", token, user: loginUser });
       } else {
         throw new Error("invalid password");
       }

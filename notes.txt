@@ -376,7 +376,10 @@ EPISODE - 9 ( DB query )
 EPISODE - 10 ( ref and populate )
 
 
+All apis:- 
 
+http://localhost:8000/profile/view
+http://localhost:8000/profile/edit
 
 
 

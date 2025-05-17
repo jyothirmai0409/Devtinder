@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const express = require("express");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 const { authMiddleware } = require("./middlewares/auth");
@@ -14,6 +15,12 @@ const PORT = process.env.PORT || 8000;
 
 app.use(express.json()); // ✅ Required for parsing JSON body
 app.use(cookieParser()); //'to read a cookie we need cookie parser middleware' ( express js package)
+app.use(
+  cors({
+    origin: "http://localhost:5173", // frontend URL
+    credentials: true, // if you're using cookies or Authorization headers
+  })
+);
 
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
@@ -61,5 +68,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log(err);
+    console.log("err in connecting db", err);
   });

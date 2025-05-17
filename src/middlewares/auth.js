@@ -4,8 +4,9 @@ const User = require("../models/user");
 const authMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies?.token;
+    console.log("jyothi here", token);
     if (!token) {
-      return res.status(401).send("Unauthorized: No token provided");
+      return res.status(401).send("Please login");
     }
     const decoded = await jwt.verify(token, process.env.SECRET_KEY);
     const loggedinUser = await User.findById(decoded.userId);
