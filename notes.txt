@@ -382,5 +382,61 @@ http://localhost:8000/profile/view
 http://localhost:8000/profile/edit
 
 
+AWS 
+------------
+- ec2 instance - create a new machine in aws (elastic compute)
+create a perm file to access server - key-pair
+chmod 400 "devConnect-secret.pem" - change the permission of the secret file else login wont work - it wont be able to connect to your machine - pem is a secret key that stores the extension
+ssh -i "devConnect-secret.pem" ubuntu@ec2-3-110-48-5.ap-south-1.compute.amazonaws.com - to login into the virtual machine using the secret key .
+need to setup all the softwares in the virtual because we need them inorder to run our application
+
+install node 
+------
+# Download and install nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+
+# in lieu of restarting the shell
+\. "$HOME/.nvm/nvm.sh"
+
+# Download and install Node.js:
+nvm install 22
+
+# Verify the Node.js version:
+node -v # Should print "v22.15.1".
+nvm current # Should print "v22.15.1".
+
+# Verify npm version:
+npm -v # Should print "10.9.2".
 
 
+-> install a node version where your code is working fine . check in your system and install same version
+
+
+# Deployment
+
+- Signup on AWS 
+- Launch instance
+- chmod 400 <secret>.pem
+- ssh -i "devTinder-secret.pem" ubuntu@ec2-43-204-96-49.ap-south-1.compute.amazonaws.com
+- Install Node version 16.17.0
+- Git clone
+- Frontend    
+    - npm install  -> dependencies install
+    - npm run build
+    - sudo apt update
+    - sudo apt install nginx
+    - sudo systemctl start nginx
+    - sudo systemctl enable nginx
+    - Copy code from dist(build files) to /var/www/html/
+    - sudo scp -r dist/* /var/www/html/
+    - Enable port :80 of your instance
+- Backend
+    - updated DB password
+    - allowed ec2 instance public IP on mongodb server
+    - npm intsall pm2 -g
+    - pm2 start npm --name "devTinder-backend" -- start
+    - pm2 logs
+    - pm2 list, pm2 flush <name> , pm2 stop <name>, pm2 delete <name>
+    - config nginx - /etc/nginx/sites-available/default
+    - restart nginx - sudo systemctl restart nginx
+    - Modify the BASEURL in frontend project to "/api"
